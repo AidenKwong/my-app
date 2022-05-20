@@ -9,7 +9,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get("profile")
   async findOne(@Request() req: any) {
-    const { password, ...profile } = await this.userService.findOne(
+    const { password, ...profile } = await this.userService.findOneByEmail(
       req.user.email,
     );
     return profile;

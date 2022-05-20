@@ -1,4 +1,12 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from "class-validator";
+import { Optional } from "@nestjs/common";
+import { Type } from "class-transformer";
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  MinLength,
+} from "class-validator";
 
 export class SignUpDto {
   @IsNotEmpty()
@@ -17,4 +25,13 @@ export class SignUpDto {
   @MinLength(6)
   @IsString()
   password: string;
+
+  @Optional()
+  @IsString()
+  gender: string;
+
+  @Optional()
+  @Type(() => Number)
+  @IsNumber()
+  age: number;
 }

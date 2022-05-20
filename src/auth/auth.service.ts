@@ -20,7 +20,7 @@ export class AuthService {
 
   async validateUser(dto: SignInDto) {
     const { email, password } = dto;
-    const user = await this.userService.findOne(email);
+    const user = await this.userService.findOneByEmail(email);
     if (!user) {
       return { result: false, message: "User not found" };
     }
@@ -35,7 +35,7 @@ export class AuthService {
   }
 
   async signin(dto: SignInDto) {
-    const user = await this.userService.findOne(dto.email);
+    const user = await this.userService.findOneByEmail(dto.email);
     const { email, id } = user;
     const payload = { email, sub: id };
     return {

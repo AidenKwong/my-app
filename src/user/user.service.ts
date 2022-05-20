@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { ForbiddenException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { SignUpDto } from "src/auth/dto/sign-up.dto";
 import { Repository } from "typeorm";
@@ -15,19 +15,31 @@ export class UserService {
   async create(dto: SignUpDto) {
     const hash = await argon2.hash(dto.password);
     dto.password = hash;
-    const user = this.usersRepository.create(dto);
-    const userAdded = await this.usersRepository.save(user);
-    delete userAdded.password;
-    delete userAdded.id;
-    return { userAdded };
+    try {
+      const user = this.usersRepository.create(dto);
+      const { password, id, ...userAdded } = await this.usersRepository.save(
+        user,
+      );
+
+      return { userAdded };
+    } catch (error) {
+      if (error.code == "ER_DUP_ENTRY") {
+        throw new ForbiddenException("User already exists");
+      }
+    }
   }
 
   async findAll() {
     return await this.usersRepository.find();
   }
 
-  async findOne(email: string) {
+  async findOneByEmail(email: string) {
     const user = await this.usersRepository.findOne({ email });
+    return user;
+  }
+
+  async findOneById(id: string) {
+    const user = await this.usersRepository.findOne({ id });
     return user;
   }
 }
